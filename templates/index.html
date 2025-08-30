@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Eventos - Página Principal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="jumbotron bg-primary text-white rounded-3 p-5 mb-5">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-calendar-star me-3"></i>
+            Bienvenido al Sistema de Gestión de Eventos
+        </h1>
+        <p class="col-md-8 fs-4">
+            Descubre, participa y organiza eventos increíbles en nuestra plataforma.
+        </p>
+        <a class="btn btn-warning btn-lg" href="{{ url_for('create_event') }}">
+            <i class="fas fa-plus me-2"></i>Crear Nuevo Evento
+        </a>
+    </div>
+</div>
+
+<!-- Eventos Destacados -->
+{% if featured_events %}
+<section class="mb-5">
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-star text-warning me-2"></i>
+            Eventos Destacados
+        </h2>
+    </div>
+    
+    <div class="row">
+        {% for event in featured_events %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card event-card position-relative h-100">
+                <div class="featured-badge">
+                    <i class="fas fa-star me-1"></i>Destacado
+                </div>
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    
+                    <div class="mb-2">
+                        <span class="category-badge">
+                            <i class="fas fa-tag me-1"></i>{{ event.category }}
+                        </span>
+                    </div>
+                    
+                    <p class="card-text text-muted">{{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}</p>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>{{ event.date }}
+                            <i class="fas fa-clock ms-2 me-1"></i>{{ event.time }}
+                            <br>
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {% set available_spots = event.max_attendees - event.attendees|length %}
+                        {% if available_spots > 0 %}
+                            <span class="attendee-count">
+                                <i class="fas fa-users me-1"></i>
+                                {{ available_spots }} espacios disponibles
+                            </span>
+                        {% else %}
+                            <span class="full-event">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                Evento lleno
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('event_detail', slug=event.slug) }}" 
+                        class="btn btn-primary">
+                            <i class="fas fa-eye me-1"></i>Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Próximos Eventos -->
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Próximos Eventos
+        </h2>
+        <small class="text-muted">{{ upcoming_events|length }} eventos disponibles</small>
+    </div>
+    
+    {% if upcoming_events %}
+        <div class="row">
+            {% for event in upcoming_events %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card event-card h-100 {% if event.featured %}border-warning{% endif %}">
+                    {% if event.featured %}
+                    <div class="featured-badge">
+                        <i class="fas fa-star me-1"></i>Destacado
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        
+                        <div class="mb-2">
+                            <span class="category-badge">
+                                <i class="fas fa-tag me-1"></i>{{ event.category }}
+                            </span>
+                        </div>
+                        
+                        <p class="card-text text-muted">
+                            {{ event.description[:80] }}{% if event.description|length > 80 %}...{% endif %}
+                        </p>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ event.date }}
+                                <i class="fas fa-clock ms-2 me-1"></i>{{ event.time }}
+                                <br>
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {% set available_spots = event.max_attendees - event.attendees|length %}
+                            {% if available_spots > 0 %}
+                                <span class="attendee-count">
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ available_spots }}/{{ event.max_attendees }} espacios
+                                </span>
+                            {% else %}
+                                <span class="full-event">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    Evento completo
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('event_detail', slug=event.slug) }}" 
+                            class="btn btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>Ver Detalles
+                            </a>
+                            {% if available_spots > 0 %}
+                            <a href="{{ url_for('register_event', slug=event.slug) }}" 
+                            class="btn btn-success btn-sm">
+                                <i class="fas fa-user-plus me-1"></i>Registrarse
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Paginación (para implementación futura) -->
+        {% if upcoming_events|length == 0 %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No hay eventos próximos</h4>
+            <p class="text-muted">¡Sé el primero en crear un evento!</p>
+            <a href="{{ url_for('create_event') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Crear Evento
+            </a>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No hay eventos disponibles</h4>
+            <p class="text-muted">¡Comienza creando tu primer evento!</p>
+            <a href="{{ url_for('create_event') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Crear Mi Primer Evento
+            </a>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Sección de Categorías -->
+<section class="mt-5 p-4 bg-light rounded-3">
+    <h3 class="mb-3">
+        <i class="fas fa-tags me-2"></i>Explorar por Categorías
+    </h3>
+    <div class="row">
+        <div class="col-md-2 col-sm-6 mb-2">
+            <a href="{{ url_for('events_by_category', category='Tecnología') }}" 
+            class="btn btn-outline-info w-100">
+                <i class="fas fa-laptop-code me-1"></i>Tecnología
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-2">
+            <a href="{{ url_for('events_by_category', category='Académico') }}" 
+            class="btn btn-outline-success w-100">
+                <i class="fas fa-graduation-cap me-1"></i>Académico
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-6 mb-2">
+            <a href="{{ url_for('events_by_category', category='Cultural') }}" 
+            class="btn btn-outline-warning w-100">
+                <i class="fas fa-theater-masks me-1"></i>Cultural
+            </a>
+        </div>
+        <div class="col-md-2
