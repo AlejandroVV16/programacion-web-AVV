@@ -11,9 +11,9 @@ app.secret_key = "supersecretkey"
 events = [
     {
         'id': 1,
-        'title': 'Conferencia de Python',
-        'slug': 'conferencia-python',
-        'description': 'Aprende sobre desarrollo con Python y Flask',
+        'title': 'Conferencia de juegos',
+        'slug': 'conferencia-juegos',
+        'description': 'Aprende sobre desarrollo con Python y Flask para juegos',
         'date': '2025-09-15',
         'time': '14:00',
         'location': 'Auditorio Principal',
@@ -95,3 +95,4 @@ def filter_category(category):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
